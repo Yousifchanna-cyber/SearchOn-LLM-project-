@@ -120,6 +120,30 @@
       .sidebar.open{display:flex}.mobile-menu{display:block}.topbar{padding:0 18px}.workspace{width:min(100% - 30px,680px);padding-top:40px}.suggestions{grid-template-columns:1fr}.suggestion{min-height:0;display:grid;grid-template-columns:30px 1fr;align-items:center;gap:10px;padding:13px}.suggestion .s-icon{margin:0}.intro{margin-top:auto}.intro-mark{margin-bottom:20px}h1{font-size:44px;max-width:380px}.intro p{font-size:15px}.composer-wrap{padding-bottom:calc(14px + env(safe-area-inset-bottom))}.message{grid-template-columns:32px minmax(0,1fr);gap:10px}.message-avatar{width:32px;height:32px}.message-text{font-size:19px}.answer{padding:17px}.preview-badge{display:none}
     }
     @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+    .settings-btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px}
+    .settings-btn:hover{border-color:var(--accent)}
+    .settings-btn svg{width:15px;height:15px}
+    .settings-panel{position:fixed;top:0;right:0;bottom:0;width:min(400px,92vw);background:var(--panel);border-left:1px solid var(--line);box-shadow:-20px 0 60px rgba(0,0,0,.15);z-index:50;padding:28px 24px;transform:translateX(105%);transition:transform .25s ease;overflow-y:auto}
+    .settings-panel.open{transform:translateX(0)}
+    .settings-panel h2{font-size:20px;margin:0 0 6px}
+    .settings-panel p.desc{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 20px}
+    .field{margin-bottom:16px}
+    .field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+    .field input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font-size:14px}
+    .field small{display:block;font-size:12px;color:var(--muted);margin-top:5px;line-height:1.4}
+    .settings-actions{display:flex;gap:10px;margin-top:22px}
+    .btn-primary{background:var(--accent);color:var(--accent-ink);border:0;border-radius:9px;padding:11px 18px;font-weight:700;cursor:pointer;flex:1}
+    .btn-secondary{background:var(--panel-soft);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:11px 18px;font-weight:600;cursor:pointer}
+    .status-line{font-size:13px;padding:10px 12px;border-radius:8px;margin-top:14px;display:none}
+    .status-line.ok{display:block;background:#e6f4ea;color:#137333}
+    .status-line.err{display:block;background:#fce8e6;color:#a50e0e}
+    .loading{display:flex;align-items:center;gap:10px;padding:20px 0;color:var(--muted);font-size:14px}
+    .spinner{width:18px;height:18px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .answer-content{font-size:15px;line-height:1.65}
+    .answer-content p{margin:0 0 12px}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:40;display:none}
+    .overlay.show{display:block}
   </style>
 </head>
 <body>
@@ -153,7 +177,13 @@
           </button>
           <div class="mode"><span class="status-dot"></span>SearchOn</div>
         </div>
-        <span class="preview-badge">Public</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="preview-badge">Public</span>
+          <button class="settings-btn" id="settingsButton" aria-label="Ollama settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Ollama
+          </button>
+        </div>
       </header>
 
       <section class="workspace">
@@ -216,6 +246,28 @@
       </section>
     </main>
   </div>
+  <div class="overlay" id="overlay"></div>
+  <div class="settings-panel" id="settingsPanel" aria-label="Ollama settings">
+    <h2>Ollama Settings</h2>
+    <p class="desc">Connect SearchOn to your free local Ollama API for live answers. Run <code>ollama serve</code> on your computer first.</p>
+    <div class="field">
+      <label for="ollamaUrl">Ollama API URL</label>
+      <input id="ollamaUrl" type="text" placeholder="http://localhost:11434" />
+      <small>Default: http://localhost:11434 — change only if your Ollama runs elsewhere.</small>
+    </div>
+    <div class="field">
+      <label for="ollamaModel">Model name</label>
+      <input id="ollamaModel" type="text" placeholder="llama3" />
+      <small>Must be a model you have pulled, e.g. llama3, mistral, phi3. Run <code>ollama pull llama3</code> to get it.</small>
+    </div>
+    <div class="settings-actions">
+      <button class="btn-primary" id="saveSettings">Save</button>
+      <button class="btn-secondary" id="testConnection">Test</button>
+      <button class="btn-secondary" id="closeSettings">Close</button>
+    </div>
+    <div class="status-line" id="settingsStatus"></div>
+    <p class="desc" style="margin-top:18px">Your settings are stored only in this browser. When Ollama is reachable, SearchOn gives live answers. Otherwise it shows the honest preview notice.</p>
+  </div>
   <div class="toast" id="toast" role="status"></div>
   <script>
     (function(){
@@ -229,24 +281,152 @@
       var menu=document.getElementById('menuButton');
       var toast=document.getElementById('toast');
       var toastTimer;
+      // Settings elements
+      var settingsPanel=document.getElementById('settingsPanel');
+      var overlay=document.getElementById('overlay');
+      var settingsButton=document.getElementById('settingsButton');
+      var ollamaUrlInput=document.getElementById('ollamaUrl');
+      var ollamaModelInput=document.getElementById('ollamaModel');
+      var settingsStatus=document.getElementById('settingsStatus');
+
+      function getSettings(){
+        var url=(localStorage.getItem('searchon_ollama_url')||'http://localhost:11434').replace(/\/$/,'');
+        var model=localStorage.getItem('searchon_ollama_model')||'llama3';
+        return {url:url, model:model};
+      }
+      function loadSettingsToForm(){
+        var s=getSettings();
+        ollamaUrlInput.value=s.url;
+        ollamaModelInput.value=s.model;
+      }
       function showToast(text){toast.textContent=text;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){toast.classList.remove('show')},1800)}
+      function openSettings(){loadSettingsToForm();settingsPanel.classList.add('open');overlay.classList.add('show')}
+      function closeSettings(){settingsPanel.classList.remove('open');overlay.classList.remove('show');settingsStatus.className='status-line';settingsStatus.textContent=''}
+      settingsButton.addEventListener('click',openSettings);
+      document.getElementById('closeSettings').addEventListener('click',closeSettings);
+      overlay.addEventListener('click',closeSettings);
+      document.getElementById('saveSettings').addEventListener('click',function(){
+        var url=ollamaUrlInput.value.trim().replace(/\/$/,'')||'http://localhost:11434';
+        var model=ollamaModelInput.value.trim()||'llama3';
+        localStorage.setItem('searchon_ollama_url',url);
+        localStorage.setItem('searchon_ollama_model',model);
+        settingsStatus.className='status-line ok';
+        settingsStatus.textContent='Saved. SearchOn will use '+model+' at '+url;
+        showToast('Ollama settings saved');
+      });
+      document.getElementById('testConnection').addEventListener('click',function(){
+        var s=getSettings();
+        var url=ollamaUrlInput.value.trim().replace(/\/$/,'')||s.url;
+        var model=ollamaModelInput.value.trim()||s.model;
+        settingsStatus.className='status-line';
+        settingsStatus.textContent='Testing…';
+        fetch(url+'/api/tags').then(function(r){
+          if(!r.ok) throw new Error('HTTP '+r.status);
+          return r.json();
+        }).then(function(data){
+          var models=(data.models||[]).map(function(m){return m.name});
+          settingsStatus.className='status-line ok';
+          if(models.length){
+            settingsStatus.textContent='Connected. Available models: '+models.slice(0,5).join(', ')+(models.length>5?'…':'');
+          } else {
+            settingsStatus.textContent='Connected to Ollama, but no models found. Run: ollama pull '+model;
+          }
+        }).catch(function(err){
+          settingsStatus.className='status-line err';
+          settingsStatus.textContent='Cannot reach Ollama at '+url+'. Is "ollama serve" running? ('+err.message+')';
+        });
+      });
+
+      var answerEl=null;
+      function ensureAnswerArea(){
+        // Find or create the live answer container inside .answer
+        var container=conversation.querySelector('.answer');
+        var existing=document.getElementById('liveAnswer');
+        if(existing){existing.innerHTML='';return existing;}
+        var div=document.createElement('div');
+        div.id='liveAnswer';
+        div.className='answer-content';
+        // Insert before the notice
+        var notice=container.querySelector('.notice');
+        container.insertBefore(div,notice);
+        return div;
+      }
+      function setNoticeVisible(visible){
+        var notice=conversation.querySelector('.notice');
+        if(notice) notice.style.display=visible?'flex':'none';
+        var paras=conversation.querySelectorAll('.answer > p');
+        paras.forEach(function(p){p.style.display=visible?'block':'none';});
+      }
+      function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+      function renderMarkdownLite(text){
+        // Minimal safe rendering: paragraphs and line breaks
+        var html=escapeHtml(text);
+        html=html.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+        var paras=html.split(/
+
++/);
+        return paras.map(function(p){return '<p>'+p.replace(/
+/g,'<br>')+'</p>'}).join('');
+      }
       function submitPrompt(text){
         text=(text||'').trim(); if(!text){input.focus();return}
         userQuestion.textContent=text; intro.classList.add('hidden'); suggestions.classList.add('hidden'); conversation.classList.add('show');
         input.value=''; sidebar.classList.remove('open'); menu.setAttribute('aria-expanded','false'); window.scrollTo({top:0,behavior:'smooth'});
+        answerEl=ensureAnswerArea();
+        tryOllama(text);
+      }
+      function tryOllama(prompt){
+        var s=getSettings();
+        answerEl.innerHTML='<div class="loading"><div class="spinner"></div><span>Thinking with '+escapeHtml(s.model)+'…</span></div>';
+        setNoticeVisible(false);
+        var controller=new AbortController();
+        var timeout=setTimeout(function(){controller.abort()},90000);
+        fetch(s.url+'/api/chat',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          signal:controller.signal,
+          body:JSON.stringify({
+            model:s.model,
+            stream:false,
+            messages:[
+              {role:'system',content:'You are SearchOn, a helpful AI assistant by Muhammad Yousif. Answer clearly and concisely.'},
+              {role:'user',content:prompt}
+            ]
+          })
+        }).then(function(r){
+          clearTimeout(timeout);
+          if(!r.ok) throw new Error('Ollama HTTP '+r.status);
+          return r.json();
+        }).then(function(data){
+          var reply=(data.message&&data.message.content)||'';
+          if(!reply.trim()) throw new Error('Empty reply');
+          answerEl.innerHTML=renderMarkdownLite(reply);
+          showToast('Live answer from Ollama');
+        }).catch(function(err){
+          clearTimeout(timeout);
+          // Fallback to honest preview notice
+          answerEl.innerHTML='';
+          setNoticeVisible(true);
+          var isAbort=err.name==='AbortError';
+          showToast(isAbort?'Ollama timed out — showing preview':'Ollama not reachable — showing preview');
+        });
       }
       composer.addEventListener('submit',function(e){e.preventDefault();submitPrompt(input.value)});
       document.querySelectorAll('[data-prompt]').forEach(function(el){el.addEventListener('click',function(){submitPrompt(el.getAttribute('data-prompt'))})});
       document.getElementById('newChat').addEventListener('click',function(){conversation.classList.remove('show');intro.classList.remove('hidden');suggestions.classList.remove('hidden');sidebar.classList.remove('open');menu.setAttribute('aria-expanded','false');input.focus()});
       document.getElementById('retryButton').addEventListener('click',function(){conversation.classList.remove('show');intro.classList.remove('hidden');suggestions.classList.remove('hidden');input.focus()});
       document.getElementById('copyButton').addEventListener('click',function(){
-        var text='This public page is an interactive product preview. A connected AI model and secure server are required before SearchOn can generate real answers.';
+        var live=document.getElementById('liveAnswer');
+        var text=(live&&live.innerText.trim())||'This public page is an interactive product preview. Connect Ollama in Settings for live answers.';
         if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){showToast('Answer copied')},function(){showToast('Copy unavailable')})}else{showToast('Copy unavailable')}
       });
-      document.getElementById('whyButton').addEventListener('click',function(){showToast('Model access must stay on a secure server')});
+      document.getElementById('whyButton').addEventListener('click',function(){showToast('Open Ollama settings to connect a local model')});
       menu.addEventListener('click',function(){var open=sidebar.classList.toggle('open');menu.setAttribute('aria-expanded',String(open))});
       document.addEventListener('click',function(e){if(window.innerWidth<=780&&sidebar.classList.contains('open')&&!sidebar.contains(e.target)&&!menu.contains(e.target)){sidebar.classList.remove('open');menu.setAttribute('aria-expanded','false')}});
-      document.addEventListener('keydown',function(e){if(e.key==='Escape'){sidebar.classList.remove('open');menu.setAttribute('aria-expanded','false')}});
+      document.addEventListener('keydown',function(e){
+        if(e.key==='Escape'){sidebar.classList.remove('open');menu.setAttribute('aria-expanded','false');closeSettings()}
+      });
+      loadSettingsToForm();
     })();
   </script>
 </body>
