@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+  <title>SearchOn</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg:#f5f4ef;
+      --panel:#ffffff;
+      --panel-soft:#ebe9e2;
+      --ink:#181814;
+      --muted:#625f55;
+      --line:#d9d6cc;
+      --accent:#d85b24;
+      --accent-ink:#ffffff;
+      --accent-soft:#f5d7c8;
+      --sidebar:#20211d;
+      --sidebar-ink:#f5f4ef;
+      --sidebar-muted:#aaa99f;
+      --shadow:0 20px 70px rgba(38,32,18,.10);
+      --focus:#007f79;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:#11120f;
+        --panel:#1a1b17;
+        --panel-soft:#24251f;
+        --ink:#f4f1e8;
+        --muted:#b9b5a8;
+        --line:#35362f;
+        --accent:#f1783f;
+        --accent-ink:#18120e;
+        --accent-soft:#48281b;
+        --sidebar:#080906;
+        --sidebar-ink:#f5f4ef;
+        --sidebar-muted:#999a91;
+        --shadow:0 24px 80px rgba(0,0,0,.35);
+        --focus:#52c7bc;
+      }
+    }
+    *{box-sizing:border-box}
+    html,body{min-height:100%;margin:0}
+    body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden}
+    button,input{font:inherit}
+    button{color:inherit}
+    button:focus-visible,input:focus-visible{outline:3px solid color-mix(in srgb,var(--focus) 60%,transparent);outline-offset:2px}
+    .app{min-height:100vh;min-height:100svh;display:grid;grid-template-columns:270px minmax(0,1fr)}
+    .sidebar{background:var(--sidebar);color:var(--sidebar-ink);padding:22px 16px 18px;display:flex;flex-direction:column;min-height:100vh;min-height:100svh;position:sticky;top:0}
+    .new-chat{border:1px solid #41423b;background:#292a25;color:#fff;border-radius:10px;padding:12px 14px;width:100%;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-weight:600;transition:background .18s ease}
+    .new-chat:hover{background:#34352f}
+    .new-chat svg{width:17px;height:17px}
+    .nav-group{margin-top:32px}
+    .nav-label{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--sidebar-muted);padding:0 10px;margin:0 0 8px}
+    .nav-item{width:100%;border:0;background:transparent;color:var(--sidebar-muted);border-radius:8px;display:flex;align-items:center;gap:11px;padding:10px;text-align:left;cursor:pointer;margin:2px 0}
+    .nav-item svg{width:18px;height:18px;flex:0 0 auto}
+    .nav-item.active,.nav-item:hover{background:#2b2c27;color:#fff}
+    .sidebar-bottom{margin-top:auto;padding:16px 10px 0;border-top:1px solid #33342e}
+    .maker{display:flex;gap:10px;align-items:center;color:var(--sidebar-muted);font-size:13px}
+    .avatar{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#1c120d;font-weight:800;text-transform:uppercase}
+    .maker strong{display:block;color:#fff;font-weight:600}
+    .main{min-width:0;display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
+    .topbar{height:64px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--bg) 90%,transparent);position:sticky;top:0;z-index:10}
+    .mode{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600}
+    .status-dot{width:8px;height:8px;border-radius:50%;background:#2aaa70;box-shadow:0 0 0 4px color-mix(in srgb,#2aaa70 15%,transparent)}
+    .preview-badge{font-size:12px;padding:6px 9px;border-radius:999px;background:var(--panel-soft);color:var(--muted);font-weight:600}
+    .mobile-menu{display:none;border:0;background:transparent;padding:8px;margin-left:-8px;cursor:pointer}
+    .mobile-menu svg{width:22px;height:22px}
+    .workspace{width:min(850px,calc(100% - 48px));margin:0 auto;flex:1;display:flex;flex-direction:column;padding:74px 0 32px}
+    .intro{text-align:center;margin:auto 0 38px}
+    .intro-mark{width:54px;height:54px;border-radius:17px;background:var(--ink);color:var(--bg);display:grid;place-items:center;margin:0 auto 24px;transform:rotate(-3deg)}
+    .intro-mark svg{width:26px;height:26px}
+    h1{font-family:"Newsreader",serif;font-size:clamp(40px,7vw,68px);line-height:.98;letter-spacing:-.04em;margin:0 auto 18px;max-width:720px;font-weight:600}
+    .intro p{font-size:17px;line-height:1.6;color:var(--muted);max-width:570px;margin:0 auto}
+    .suggestions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:28px 0 18px}
+    .suggestion{background:var(--panel);border:1px solid var(--line);padding:16px;border-radius:12px;text-align:left;cursor:pointer;min-height:98px;transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}
+    .suggestion:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 10px 28px rgba(38,32,18,.08)}
+    .suggestion .s-icon{display:flex;align-items:center;justify-content:center;width:27px;height:27px;border-radius:7px;background:var(--accent-soft);color:var(--accent);margin-bottom:13px}
+    .suggestion svg{width:15px;height:15px}
+    .suggestion span{font-size:13px;line-height:1.35;font-weight:600;display:block}
+    .composer-wrap{position:sticky;bottom:0;padding:16px 0 calc(18px + env(safe-area-inset-bottom));background:linear-gradient(180deg,transparent 0,var(--bg) 24%)}
+    .composer{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:10px 10px 10px 18px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+    .composer input{border:0;outline:0;background:transparent;color:var(--ink);min-width:0;flex:1;height:40px;font-size:15px}
+    .composer input::placeholder{color:var(--muted)}
+    .send{width:40px;height:40px;border-radius:11px;border:0;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;cursor:pointer;transition:filter .18s ease}
+    .send:hover{filter:brightness(.94)}
+    .send svg{width:18px;height:18px}
+    .hint{font-size:11px;color:var(--muted);text-align:center;margin:9px 0 0}
+    .conversation{display:none;flex-direction:column;gap:26px;padding:18px 0 36px}
+    .conversation.show{display:flex}
+    .intro.hidden,.suggestions.hidden{display:none}
+    .message{display:grid;grid-template-columns:36px minmax(0,1fr);gap:14px;align-items:start}
+    .message-avatar{width:36px;height:36px;border-radius:10px;background:var(--ink);color:var(--bg);display:grid;place-items:center}
+    .message-avatar.user{background:var(--accent);color:var(--accent-ink);font-weight:800;font-size:13px}
+    .message-avatar svg{width:18px;height:18px}
+    .message-body{padding-top:5px;min-width:0}
+    .message-name{font-size:13px;font-weight:700;margin-bottom:7px}
+    .message-text{font-family:"Newsreader",serif;font-size:21px;line-height:1.48;margin:0;color:var(--ink)}
+    .answer{background:var(--panel);border:1px solid var(--line);border-radius:6px 16px 16px 16px;padding:21px 22px}
+    .answer p{font-size:15px;line-height:1.65;margin:0 0 14px;color:var(--ink)}
+    .answer p:last-of-type{margin-bottom:0}
+    .answer strong{font-weight:700}
+    .answer-tools{display:flex;align-items:center;gap:6px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+    .tool-btn{border:0;background:transparent;color:var(--muted);display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600}
+    .tool-btn:hover{background:var(--panel-soft);color:var(--ink)}
+    .tool-btn svg{width:15px;height:15px}
+    .notice{display:flex;gap:10px;align-items:flex-start;background:var(--accent-soft);color:var(--ink);padding:13px 14px;border-radius:10px;margin-top:15px;font-size:13px;line-height:1.5}
+    .notice svg{width:17px;height:17px;flex:0 0 auto;margin-top:1px;color:var(--accent)}
+    .notice button{border:0;background:transparent;color:var(--accent);font-weight:700;padding:0;cursor:pointer}
+    .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,14px);background:var(--ink);color:var(--bg);padding:9px 13px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:all .2s ease;z-index:30}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(max-width:780px){
+      .app{display:block}.sidebar{display:none;position:fixed;inset:0 auto 0 0;width:min(82vw,300px);z-index:40;box-shadow:20px 0 50px rgba(0,0,0,.25)}
+      .sidebar.open{display:flex}.mobile-menu{display:block}.topbar{padding:0 18px}.workspace{width:min(100% - 30px,680px);padding-top:40px}.suggestions{grid-template-columns:1fr}.suggestion{min-height:0;display:grid;grid-template-columns:30px 1fr;align-items:center;gap:10px;padding:13px}.suggestion .s-icon{margin:0}.intro{margin-top:auto}.intro-mark{margin-bottom:20px}h1{font-size:44px;max-width:380px}.intro p{font-size:15px}.composer-wrap{padding-bottom:calc(14px + env(safe-area-inset-bottom))}.message{grid-template-columns:32px minmax(0,1fr);gap:10px}.message-avatar{width:32px;height:32px}.message-text{font-size:19px}.answer{padding:17px}.preview-badge{display:none}
+    }
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="Workspace navigation">
+      <button class="new-chat" id="newChat">New conversation
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <nav class="nav-group" aria-label="Capabilities">
+        <p class="nav-label">Workspace</p>
+        <button class="nav-item active" data-prompt="Help me explore a difficult question from multiple angles">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg>Explore
+        </button>
+        <button class="nav-item" data-prompt="Explain a complex idea in a clear, structured way">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v12H8l-4 4V5Z"/><path d="M8 9h8M8 13h5"/></svg>Explain
+        </button>
+        <button class="nav-item" data-prompt="Help me turn a rough idea into something useful">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 1.8 4.8L19 9.5l-4 3.2.2 5.3-4.4-2.9L6 17l1.4-5.1L4 8l5.2-.2L12 3Z"/></svg>Create
+        </button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="maker"><span class="avatar">Y</span><span><strong>yousif</strong>Creator &amp; owner</span></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="mobile-menu" id="menuButton" aria-label="Open navigation" aria-expanded="false">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          </button>
+          <div class="mode"><span class="status-dot"></span>SearchOn</div>
+        </div>
+        <span class="preview-badge">Public</span>
+      </header>
+
+      <section class="workspace">
+        <div class="intro" id="intro">
+          <div class="intro-mark">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
+          </div>
+          <h1>Find the signal.<br>Build the next idea.</h1>
+          <p>A focused space for researching questions, understanding complex topics, and shaping first thoughts into clear work.</p>
+        </div>
+
+        <div class="suggestions" id="suggestions">
+          <button class="suggestion" data-prompt="Help me break a complex decision into clear tradeoffs">
+            <span class="s-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            <span>Break a difficult decision into clear tradeoffs</span>
+          </button>
+          <button class="suggestion" data-prompt="Turn a rough product idea into a simple launch plan">
+            <span class="s-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg></span>
+            <span>Turn a rough product idea into a launch plan</span>
+          </button>
+          <button class="suggestion" data-prompt="Explain how modern AI assistants work without the jargon">
+            <span class="s-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 18h.01M9.1 9a3 3 0 1 1 4.7 2.5c-1.2.8-1.8 1.4-1.8 2.5"/><circle cx="12" cy="12" r="9"/></svg></span>
+            <span>Explain modern AI assistants without jargon</span>
+          </button>
+        </div>
+
+        <div class="conversation" id="conversation" aria-live="polite">
+          <article class="message">
+            <div class="message-avatar user" aria-hidden="true">Y</div>
+            <div class="message-body"><div class="message-name">You</div><p class="message-text" id="userQuestion"></p></div>
+          </article>
+          <article class="message">
+            <div class="message-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></div>
+            <div class="message-body"><div class="message-name">SearchOn</div>
+              <div class="answer">
+                <p><strong>This public page is an interactive product preview.</strong> It demonstrates the conversation experience, response controls, and the visual direction of SearchOn.</p>
+                <p>A connected AI model and secure server are required before it can generate a real answer to your question. The interface stays honest rather than pretending a scripted response came from an AI.</p>
+                <div class="notice">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 17h.01"/></svg>
+                  <span>Live answers are not enabled in this public preview. <button id="whyButton">Why?</button></span>
+                </div>
+                <div class="answer-tools">
+                  <button class="tool-btn" id="copyButton"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Copy</button>
+                  <button class="tool-btn" id="retryButton"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 9a7 7 0 0 1 11.7-2L20 9M4 15l2.2 2a7 7 0 0 0 11.7-2"/></svg>Try another prompt</button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="composer-wrap">
+          <form class="composer" id="composer">
+            <input id="promptInput" type="text" autocomplete="off" aria-label="Message SearchOn" placeholder="Ask SearchOn anything…" />
+            <button class="send" type="submit" aria-label="Send message">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 14-8-4 16-3-6-7-2Z"/><path d="m12 14 7-10"/></svg>
+            </button>
+          </form>
+          <p class="hint">SearchOn can make mistakes. Check important information.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script>
+    (function(){
+      var intro=document.getElementById('intro');
+      var suggestions=document.getElementById('suggestions');
+      var conversation=document.getElementById('conversation');
+      var userQuestion=document.getElementById('userQuestion');
+      var input=document.getElementById('promptInput');
+      var composer=document.getElementById('composer');
+      var sidebar=document.getElementById('sidebar');
+      var menu=document.getElementById('menuButton');
+      var toast=document.getElementById('toast');
+      var toastTimer;
+      function showToast(text){toast.textContent=text;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){toast.classList.remove('show')},1800)}
+      function submitPrompt(text){
+        text=(text||'').trim(); if(!text){input.focus();return}
+        userQuestion.textContent=text; intro.classList.add('hidden'); suggestions.classList.add('hidden'); conversation.classList.add('show');
+        input.value=''; sidebar.classList.remove('open'); menu.setAttribute('aria-expanded','false'); window.scrollTo({top:0,behavior:'smooth'});
+      }
+      composer.addEventListener('submit',function(e){e.preventDefault();submitPrompt(input.value)});
+      document.querySelectorAll('[data-prompt]').forEach(function(el){el.addEventListener('click',function(){submitPrompt(el.getAttribute('data-prompt'))})});
+      document.getElementById('newChat').addEventListener('click',function(){conversation.classList.remove('show');intro.classList.remove('hidden');suggestions.classList.remove('hidden');sidebar.classList.remove('open');menu.setAttribute('aria-expanded','false');input.focus()});
+      document.getElementById('retryButton').addEventListener('click',function(){conversation.classList.remove('show');intro.classList.remove('hidden');suggestions.classList.remove('hidden');input.focus()});
+      document.getElementById('copyButton').addEventListener('click',function(){
+        var text='This public page is an interactive product preview. A connected AI model and secure server are required before SearchOn can generate real answers.';
+        if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){showToast('Answer copied')},function(){showToast('Copy unavailable')})}else{showToast('Copy unavailable')}
+      });
+      document.getElementById('whyButton').addEventListener('click',function(){showToast('Model access must stay on a secure server')});
+      menu.addEventListener('click',function(){var open=sidebar.classList.toggle('open');menu.setAttribute('aria-expanded',String(open))});
+      document.addEventListener('click',function(e){if(window.innerWidth<=780&&sidebar.classList.contains('open')&&!sidebar.contains(e.target)&&!menu.contains(e.target)){sidebar.classList.remove('open');menu.setAttribute('aria-expanded','false')}});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape'){sidebar.classList.remove('open');menu.setAttribute('aria-expanded','false')}});
+    })();
+  </script>
+</body>
+</html>
